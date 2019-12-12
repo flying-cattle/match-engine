@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<style type="text/css">
+body {
+	background: #fff;
+	font: normal 12px/22px 宋体;
+}
+
+table {
+	width: 200px;
+	frame: below;
+	text-align: center;
+}
+</style>
+<script type="text/javascript" src="/js/jquery1.42.min.js"></script>
+<script type="text/javascript">
+	function aa() {
+		var sock = null;
+		//服务器的地址
+		var wsuri = "ws://localhost:8080/websocket";
+		window.onload = function() {
+			console.log("onload");
+			sock = new WebSocket(wsuri);
+			sock.onopen = function() {
+				//成功连接到服务器
+				console.log("connected to " + wsuri);
+			}
+			sock.onclose = function(e) {
+				console.log("connection closed (" + e.code + ")");
+			}
+			sock.onmessage = function(e) {
+				//服务器发送通知
+				//开始处理
+				console.log("message received: " + e.data);
+			}
+		};
+	}
+</script>
+</head>
+
+<body>
+
+	<a href="javascript:aa()">超链接3</a>
+	<table id="sell" frame=below>
+		<tr id="sell10">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="sell9">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="sell8">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="sell7">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="sell6">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="sell5">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="sell4">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="sell3">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="sell2">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="sell1">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+	<table id="buy">
+		<tr id="buy10">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="buy9">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="buy8">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="buy7">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="buy6">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="buy5">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="buy4">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="buy3">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="buy2">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr id="buy1">
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+</body>
+</html>
