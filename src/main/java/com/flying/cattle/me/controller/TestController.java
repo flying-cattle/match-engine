@@ -2,7 +2,6 @@ package com.flying.cattle.me.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -11,30 +10,35 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.flying.cattle.me.disruptor.producer.OrderProducer;
 import com.flying.cattle.me.entity.Depth;
 import com.flying.cattle.me.entity.MatchOrder;
 import com.flying.cattle.me.util.HazelcastUtil;
 import com.flying.cattle.me.util.SnowflakeIdWorker;
-import com.hazelcast.jet.IMapJet;
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 import com.lmax.disruptor.RingBuffer;
 
+import reactor.core.publisher.Mono;
+
 //@Profile("local")
-@RestController
+@Controller
 @RequestMapping("/test")
 public class TestController {
 	@Autowired
 	RingBuffer<MatchOrder> ringBuffer;
 
 	@Autowired
-	JetInstance jet;
+	HazelcastInstance hzInstance;
 
 	@GetMapping("/addMany")
+	@ResponseBody
 	public Boolean addOrder(long size) {
 		for (long i = 0; i < size; i++) {
 			final long a = i;
@@ -84,6 +88,7 @@ public class TestController {
 	}
 
 	@GetMapping("/addOneMarketSell")
+	@ResponseBody
 	public Boolean addOneMarketSell(BigDecimal number) {
 		OrderProducer producer = new OrderProducer(ringBuffer);
 		MatchOrder or = new MatchOrder();
@@ -105,6 +110,7 @@ public class TestController {
 	}
 
 	@GetMapping("/addOne")
+	@ResponseBody
 	public Boolean addOrderOne(boolean isBuy, BigDecimal price, BigDecimal number) {
 		OrderProducer producer = new OrderProducer(ringBuffer);
 		MatchOrder or = new MatchOrder();
@@ -131,9 +137,10 @@ public class TestController {
 	}
 
 	@GetMapping("/getDepth")
+	@ResponseBody
 	public Map<String, List<Depth>> addOrderOne() {
 		// 获取对手盘口
-		IMapJet<BigDecimal, BigDecimal> buyMap = jet.getMap(HazelcastUtil.getMatchKey("XBIT-USDT", Boolean.TRUE));
+		IMap<BigDecimal, BigDecimal> buyMap = hzInstance.getMap(HazelcastUtil.getMatchKey("XBIT-USDT", Boolean.TRUE));
 		List<Depth> buyList = new ArrayList<Depth>();
 		List<Depth> sellList = new ArrayList<Depth>();
 		if (buyMap.size()>0) {
@@ -145,7 +152,7 @@ public class TestController {
 			buyList.add(depth);
 		}
 		
-		IMapJet<BigDecimal, BigDecimal> sellMap = jet.getMap(HazelcastUtil.getMatchKey("XBIT-USDT", Boolean.FALSE));
+		IMap<BigDecimal, BigDecimal> sellMap = hzInstance.getMap(HazelcastUtil.getMatchKey("XBIT-USDT", Boolean.FALSE));
 		if (sellMap.size()>0) {
 			sellList = sellMap.entrySet().stream().sorted(Entry.<BigDecimal, BigDecimal>comparingByKey())
 					.map(obj -> new Depth(obj.getKey().toString(), obj.getValue().toString(), obj.getValue().toString(), 1,"XBIT-USDT", Boolean.TRUE))
@@ -166,4 +173,11 @@ public class TestController {
 		map.put("SELL", sellList);
 		return map;
 	}
+	
+	
+	@GetMapping("/index")
+	public Mono<String> index(final Model model) {
+        String path = "index";
+        return Mono.create(monoSink -> monoSink.success(path));
+    }
 }

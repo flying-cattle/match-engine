@@ -1,9 +1,10 @@
-package com.flying.cattle.me.ws.handler;
+package com.flying.cattle.me.other.ws.handler;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -11,9 +12,11 @@ import org.springframework.web.reactive.socket.HandshakeInfo;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
+
+import com.flying.cattle.me.other.ws.annotations.WebSocketMapping;
+import com.flying.cattle.me.other.ws.entity.WebSocketSender;
 import com.flying.cattle.me.util.SnowflakeIdWorker;
-import com.flying.cattle.me.ws.annotations.WebSocketMapping;
-import com.flying.cattle.me.ws.entity.WebSocketSender;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8080
 spring: 
   #Redis配置
   redis:
@@ -8,3 +8,12 @@ spring:
     sentinel:
       master: mymaster
       nodes: 192.168.9.232:26379,192.168.9.232:26380,192.168.9.232:26381
+  thymeleaf:
+    prefix: classpath:/templates/
+    enabled: true
+    suffix: .html
+    cache: false
+    template-resolver-order: 1
+    check-template: false
+    reactive:
+      max-chunk-size: 8192

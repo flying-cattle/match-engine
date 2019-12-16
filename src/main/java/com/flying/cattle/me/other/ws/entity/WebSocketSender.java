@@ -1,4 +1,4 @@
-package com.flying.cattle.me.ws.entity;
+package com.flying.cattle.me.other.ws.entity;
 
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;

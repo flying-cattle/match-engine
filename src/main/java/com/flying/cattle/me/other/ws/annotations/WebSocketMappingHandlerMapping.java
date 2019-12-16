@@ -1,4 +1,4 @@
-package com.flying.cattle.me.ws.annotations;
+package com.flying.cattle.me.other.ws.annotations;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

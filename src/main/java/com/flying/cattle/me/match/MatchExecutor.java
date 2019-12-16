@@ -12,6 +12,8 @@ import com.flying.cattle.me.entity.MatchOrder;
 import com.flying.cattle.me.enums.DealWay;
 import com.flying.cattle.me.enums.OrderState;
 import com.flying.cattle.me.util.HazelcastUtil;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 import com.hazelcast.jet.IMapJet;
 import com.hazelcast.jet.JetInstance;
 
@@ -22,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MatchExecutor {
 
 	@Autowired
-	JetInstance jet;
+	HazelcastInstance hzInstance;
 	
 	@Autowired
 	MatchDetailHandler matchDetailHandler;
@@ -33,8 +35,7 @@ public class MatchExecutor {
 	public MatchOrder doMatch(MatchOrder input) {
 		try {
 			// 获取对手盘口
-			IMapJet<BigDecimal, BigDecimal> outMap = jet
-					.getMap(HazelcastUtil.getMatchKey(input.getCoinTeam(), !input.getIsBuy()));
+			IMap<BigDecimal, BigDecimal> outMap = hzInstance.getMap(HazelcastUtil.getMatchKey(input.getCoinTeam(), !input.getIsBuy()));
 			if (null!=outMap&&outMap.size()>0) {
 				BigDecimal outPrice = HazelcastUtil.getOptimalMatch(outMap,input.getIsBuy()); 
 				if (HazelcastUtil.canMatch(input, outPrice)) {

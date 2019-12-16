@@ -4,30 +4,32 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
-
 import com.flying.cattle.me.entity.LevelMatch;
 import com.flying.cattle.me.entity.MatchOrder;
 import com.flying.cattle.me.entity.Trade;
 import com.flying.cattle.me.enums.DealWay;
 import com.flying.cattle.me.enums.OrderState;
 import com.flying.cattle.me.util.HazelcastUtil;
-import com.hazelcast.jet.IMapJet;
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 import com.hazelcast.query.Predicate;
 import com.hazelcast.query.Predicates;
+import com.hazelcast.transaction.TransactionContext;
+import com.hazelcast.transaction.TransactionOptions;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @EnableAsync
+@Slf4j
 public class MatchDetailHandler {
 
 	@Autowired
-	JetInstance jet;
+	HazelcastInstance hzInstance;
 
 	@Autowired
 	ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
@@ -77,11 +79,19 @@ public class MatchDetailHandler {
 	 * @throws
 	 */
 	public void inputMatchDepth(MatchOrder input) {
-		IMapJet<BigDecimal, BigDecimal> map = jet.getMap(HazelcastUtil.getMatchKey(input.getCoinTeam(), input.getIsBuy()));
-		IMapJet<Long, MatchOrder> order_map = jet.getMap(HazelcastUtil.getOrderBookKey(input.getCoinTeam(), input.getIsBuy()));
-		map.compute(input.getPrice(),(k, v) -> HazelcastUtil.numberAdd(k, input.getUnFinishNumber()));
-		input.setList(null);
-		order_map.put(input.getId(), input);
+		TransactionOptions options = new TransactionOptions().setTransactionType(TransactionOptions.TransactionType.ONE_PHASE);
+		TransactionContext context = hzInstance.newTransactionContext(options);
+		context.beginTransaction();
+		try {
+			IMap<BigDecimal, BigDecimal> map = hzInstance.getMap(HazelcastUtil.getMatchKey(input.getCoinTeam(), input.getIsBuy()));
+			IMap<Long, MatchOrder> order_map = hzInstance.getMap(HazelcastUtil.getOrderBookKey(input.getCoinTeam(), input.getIsBuy()));
+			map.compute(input.getPrice(),(k, v) -> HazelcastUtil.numberAdd(v, input.getUnFinishNumber()));
+			input.setList(null);
+			order_map.put(input.getId(), input);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
 	}
 
 	/**
@@ -102,7 +112,7 @@ public class MatchDetailHandler {
 				BigDecimal dealNumber = lm.getNumber();
 				while (dealNumber.compareTo(BigDecimal.ZERO)>0) {
 					//对手盘
-					IMapJet<Long, MatchOrder> order_map = jet.getMap(HazelcastUtil.getOrderBookKey(order.getCoinTeam(), !order.getIsBuy()));
+					IMap<Long, MatchOrder> order_map = hzInstance.getMap(HazelcastUtil.getOrderBookKey(order.getCoinTeam(), !order.getIsBuy()));
 					@SuppressWarnings("rawtypes")
 					Predicate pricePredicate = Predicates.equal("price", lm.getPrice());
 					Collection<MatchOrder> orders = order_map.values(pricePredicate);

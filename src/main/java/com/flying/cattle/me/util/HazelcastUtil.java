@@ -8,9 +8,9 @@ package com.flying.cattle.me.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Map;
 
 import com.flying.cattle.me.entity.MatchOrder;
-import com.hazelcast.jet.IMapJet;
 
 /**
  * -说明：Hazelcast 相关静态方法工具类
@@ -101,7 +101,7 @@ public class HazelcastUtil {
 	 * @param outMap 对手盘口数据
 	 * @param isBuy 是来的买单
 	 */
-	public static BigDecimal getOptimalMatch(IMapJet<BigDecimal, BigDecimal> outMap,Boolean isBuy) {
+	public static BigDecimal getOptimalMatch(Map<BigDecimal, BigDecimal> outMap,Boolean isBuy) {
 		if (isBuy) {//是买，获取卖，取最小
 			return outMap.keySet().parallelStream().min(BigDecimal::compareTo).get();
 		}else {

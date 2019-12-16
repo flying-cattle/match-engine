@@ -4,12 +4,12 @@
  * Copyright(c) 2020 FlyCattle Co. Ltd. 
  * All right reserved. 
  */
-package com.flying.cattle.me.ws.annotations;
+package com.flying.cattle.me.other.ws.annotations;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @ClassName: MatchStrategyFactory
